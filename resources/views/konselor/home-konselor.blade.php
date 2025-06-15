@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Konselor Dashboard - My Appointments</title> {{-- Ubah judul halaman --}}
+    <title>Konselor Dashboard - Calendar</title>
 
     <link rel="stylesheet" href="{{ asset('css/konselor.css') }}" />
 
@@ -13,82 +13,94 @@
             color: #333;
         }
 
-        .appointment-card {
-            background-color: #f7f9fc;
-            border-radius: 10px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            padding: 20px 25px;
-            margin-bottom: 15px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: default;
-        }
-
-        .appointment-card:hover {
-            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-            transform: translateY(-3px);
-        }
-
-        .appointment-card p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .appointment-card p:first-child {
-            font-weight: 700;
-            color: #222;
-            font-size: 18px;
+        body {
+            height: auto; /* Diubah jadi lebih lebar */
         }
 
         /* --- Gaya untuk Kalender Dinamis --- */
+        .calendar-section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-top: 30px;
+            /* --- PERUBAHAN DI SINI UNTUK LEBAR --- */
+            max-width: 100%; /* Pastikan bisa selebar parent */
+            margin-left: 0; /* Hapus auto margin untuk tidak di tengah */
+            margin-right: 0; /* Hapus auto margin untuk tidak di tengah */
+            width: 100%; /* Pastikan mengambil 100% lebar yang tersedia */
+            box-sizing: border-box; /* Sertakan padding dalam perhitungan lebar */
+            /* --- AKHIR PERUBAHAN --- */
+        }
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
         }
         .calendar-header h2 {
             margin: 0;
             color: #333;
+            font-size: 24px;
         }
         .calendar-nav button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 18px;
+            border-radius: 7px;
             cursor: pointer;
-            margin-left: 5px;
-            transition: background-color 0.3s ease;
+            margin-left: 8px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
         }
         .calendar-nav button:hover {
             background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+        .calendar-nav button:active {
+            transform: translateY(0);
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            gap: 8px;
         }
         .day-header, .day-cell {
             text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            min-height: 80px;
+            padding: 12px 5px;
+            border-radius: 8px;
             position: relative;
             box-sizing: border-box;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+
+            min-height: 120px;
+            max-height: 180px;
+            overflow-y: auto;
         }
+
+        .day-cell::-webkit-scrollbar {
+            width: 6px;
+        }
+        .day-cell::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+        .day-cell::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,0.1);
+        }
+
         .day-header {
             font-weight: bold;
             background-color: #e0e0e0;
             color: #555;
+            font-size: 1.1em;
         }
         .day-cell {
             border: 1px solid #eee;
@@ -103,32 +115,35 @@
             font-weight: bold;
         }
         .day-number {
-            font-size: 1.2em;
+            font-size: 1.3em;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: block;
+            font-weight: bold;
         }
         .event {
-            font-size: 0.75em;
-            padding: 2px 5px;
-            margin-top: 3px;
-            border-radius: 3px;
+            font-size: 0.8em;
+            padding: 3px 6px;
+            margin-top: 2px;
+            border-radius: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
             transition: background-color 0.2s ease;
+            width: calc(100% - 10px);
+            text-align: center;
         }
         .event:hover {
             opacity: 0.9;
         }
         .event.booking-event {
-            background-color: #d4edda; /* Warna hijau untuk booking */
+            background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
         .event.no-booking {
-            background-color: #f8d7da; /* Warna merah muda untuk slot tanpa booking (jika ditampilkan) */
+            background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
@@ -148,52 +163,39 @@
             <li><a href="{{ route('konselor.dashboard') }}">Home</a></li>
             <li><a href="{{ route('konselor.my_schedules.create') }}">Input Jadwal</a></li>
             <li><a href="{{ route('konselor.my_schedules') }}">My Schedules</a></li>
+            <li><a href="{{ route('konselor.feedback') }}"> Feedback</a><li></li>
             <li style="margin-top: 131%;"><a href="{{ route('logout') }}">Log Out</a></li>
         </ul>
     </div>
 
     <div class="header">
-        <h2>Hello {{ $user->name ?? $konselor->nama ?? 'Konselor' }},</h2>
+        <h2>Hello {{ Auth::user()->name ?? $konselor->nama ?? 'Konselor' }},</h2>
         <h1>Good Morning!</h1>
-
-        <div class="calendar-header">
-            <h2 id="current-month-display">{{ $currentMonth }}</h2>
-            <div class="calendar-nav">
-                <button id="prevMonth">Previous Month</button>
-                <button id="nextMonth">Next Month</button>
-            </div>
-        </div>
     </div>
 
     <div class="main">
-        <h2 style="margin-bottom: 20px; margin-top: 3px;">My Appointments</h2> {{-- TEKS INI DIUBAH --}}
-
-        @forelse($todaysBookings as $booking)
-            <div class="appointment-card">
-                <p><strong>ID Booking:</strong> {{ $booking->id }}</p>
-                <p><strong>Mahasiswa:</strong> {{ $booking->mahasiswa->nama ?? 'N/A' }} (NIM: {{ $booking->mahasiswa->nim ?? 'N/A' }})</p>
-                <p><strong>Waktu:</strong> {{ \Carbon\Carbon::parse($booking->jadwal->waktu)->format('H:i') }}</p>
-                <p><strong>Status:</strong> {{ $booking->status }}</p>
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <h2 id="current-month-display">{{ $currentMonth }}</h2>
+                <div class="calendar-nav">
+                    <button id="prevMonth">Previous Month</button>
+                    <button id="nextMonth">Next Month</button>
+                </div>
             </div>
-        @empty
-            <p>Tidak ada janji temu hari ini.</p>
-        @endforelse
-
-        <div id="calendar-grid-container" class="calendar-grid">
-            <!-- Day Headers -->
-            @foreach (['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as $day)
-                <div class="day-header">{{ $day }}</div>
-            @endforeach
-            <!-- Cells will be generated by JS -->
+            <div id="calendar-grid-container" class="calendar-grid">
+                @foreach (['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as $day)
+                    <div class="day-header">{{ $day }}</div>
+                @endforeach
+                </div>
         </div>
     </div>
 
     <div class="profil">
         <img src="{{ asset('images/profil.jpg') }}" alt="Profil Konselor">
         <div class="profile-info">
-            <h3>{{ $konselor->nama ?? $user->name ?? 'Nama Konselor' }}</h3>
+            <h3>{{ $konselor->nama ?? Auth::user()->name ?? 'Nama Konselor' }}</h3>
             <p>{{ $konselor->spesialisasi ?? 'Spesialisasi Konselor' }}</p>
-            <p>{{ $user->email ?? 'Email Konselor' }}</p>
+            <p>{{ Auth::user()->email ?? 'Email Konselor' }}</p>
         </div>
     </div>
 
@@ -204,9 +206,9 @@
             const prevMonthBtn = document.getElementById('prevMonth');
             const nextMonthBtn = document.getElementById('nextMonth');
 
-            const allBookings = @json($allKonselorBookings);
+            const allBookings = @json($allKonselorBookings); 
             
-            let currentCalendarDate = new Date();
+            let currentCalendarDate = new Date(); 
 
             function renderCalendar() {
                 while (calendarGridContainer.children.length > 7) {
@@ -217,15 +219,15 @@
                 currentMonthDisplay.textContent = monthYearFormatter.format(currentCalendarDate);
 
                 const year = currentCalendarDate.getFullYear();
-                const month = currentCalendarDate.getMonth();
+                const month = currentCalendarDate.getMonth(); 
 
                 const firstDayOfMonth = new Date(year, month, 1);
-                const startingDay = (firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1);
+                const startingDay = (firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1); 
 
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const daysInMonth = new Date(year, month + 1, 0).getDate(); 
 
-                const today = new Date();
-                const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+                const today = new Date(); 
+                const isCurrentMonthViewed = today.getFullYear() === year && today.getMonth() === month;
 
                 for (let i = 0; i < startingDay; i++) {
                     const emptyCell = document.createElement('div');
@@ -244,13 +246,16 @@
                     dayCell.appendChild(dayNumberSpan);
 
                     const currentDay = new Date(year, month, day);
-                    const currentDayString = currentDay.toISOString().slice(0, 10);
+                    const currentDayString = currentDay.toISOString().slice(0, 10); 
 
-                    if (isCurrentMonth && day === today.getDate()) {
+                    if (isCurrentMonthViewed && day === today.getDate()) {
                         dayCell.classList.add('today');
                     }
 
-                    const bookingsForThisDay = allBookings.filter(booking => booking.date === currentDayString);
+                    const bookingsForThisDay = allBookings.filter(booking => {
+                        return booking.date === currentDayString;
+                    });
+
                     bookingsForThisDay.forEach(booking => {
                         const eventDiv = document.createElement('div');
                         eventDiv.classList.add('event', 'booking-event');
@@ -273,7 +278,7 @@
                 renderCalendar();
             });
 
-            renderCalendar();
+            renderCalendar(); 
         });
     </script>
 </body>

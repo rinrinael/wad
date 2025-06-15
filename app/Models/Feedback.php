@@ -12,7 +12,8 @@ class Feedback extends Model
         'komentar',
         'rating',
         'nim',
-        'konselor_id'
+        'konselor_id',
+        'booking_id',
     ];
 
     // Relasi: Satu Mahasiswa bisa membuat banyak Feedback

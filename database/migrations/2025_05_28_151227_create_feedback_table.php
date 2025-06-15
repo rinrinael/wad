@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('booking', function (Blueprint $table) {
+        Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->string('nim'); 
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
-            $table->date('tanggal');
-            $table->string('status'); 
             $table->timestamps();
         });
     }
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('booking');
+        Schema::dropIfExists('feedback');
     }
 };

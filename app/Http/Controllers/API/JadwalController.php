@@ -7,6 +7,7 @@ use App\Models\Jadwal;
 use App\Models\Konselor; // Tambahkan ini jika belum ada
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon; // Pastikan Carbon diimpor
 
 class JadwalController extends Controller
 {
@@ -140,5 +141,72 @@ class JadwalController extends Controller
 
         // Redirect ke halaman daftar jadwal konselor setelah berhasil menghapus
         return redirect()->route('konselor.my_schedules')->with('success', 'Jadwal berhasil dihapus.');
+    }
+    
+    // --- METODE BARU UNTUK ADMIN MANAGEMENT SCHEDULE ---
+
+    /**
+     * Tampilkan semua jadwal (untuk Admin).
+     * Metode ini dipanggil oleh rute 'manage.schedule'.
+     */
+    public function indexAdmin()
+    {
+        // Ambil SEMUA jadwal dengan data konselornya dan juga relasi booking
+        $schedules = Jadwal::with(['konselor', 'booking'])->latest()->get(); // <-- PERUBAHAN DI SINI: Tambahkan 'booking'
+
+        // Arahkan ke view admin dengan membawa data semua jadwal
+        return view('admin.kelola-jadwal', compact('schedules'));
+    }
+
+    /**
+     * Menampilkan form untuk mengedit jadwal (untuk Admin).
+     * Diakses melalui GET /admin/schedules/{id}/edit
+     */
+    public function editAdmin($id)
+    {
+        $jadwal = Jadwal::with('konselor')->findOrFail($id); // Eager load konselor
+        $user = Auth::user(); // User yang login (admin)
+
+        return view('admin.schedules.edit', compact('jadwal', 'user')); // Menggunakan view baru di admin.schedules.edit
+    }
+
+    /**
+     * Update jadwal di database (untuk Admin).
+     * Diakses melalui PUT /admin/schedules/{id}
+     */
+    public function updateAdmin(Request $request, $id)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+
+        $request->validate([
+            'hari' => 'required|date',
+            'waktu' => 'required|date_format:H:i|before_or_equal:21:00',
+            'status' => 'required|string|in:available,not_available,booked,cancelled'
+        ]);
+
+        $jadwal->update($request->only(['hari', 'waktu', 'status']));
+
+        return redirect()->route('manage.schedule')->with('success', 'Jadwal berhasil diupdate oleh Admin.');
+    }
+
+    /**
+     * Hapus jadwal dari database (untuk Admin).
+     * Diakses melalui DELETE /admin/schedules/{id}
+     */
+    public function destroyAdmin($id)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        
+        // Opsional: Periksa apakah ada booking terkait sebelum menghapus
+        // Jika ada booking, Anda mungkin ingin menghapus booking tersebut juga atau mengubah statusnya
+        // Contoh: Jika ada booking, set statusnya ke 'cancelled' dan kemudian hapus jadwal
+        if ($jadwal->booking) {
+            $jadwal->booking->status = 'cancelled'; // Atau hapus bookingnya: $jadwal->booking->delete();
+            $jadwal->booking->save();
+        }
+        
+        $jadwal->delete();
+
+        return redirect()->route('manage.schedule')->with('success', 'Jadwal berhasil dihapus oleh Admin.');
     }
 }

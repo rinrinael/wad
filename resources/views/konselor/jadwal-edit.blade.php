@@ -23,6 +23,7 @@
             <li><a href="{{ route('konselor.dashboard') }}">Home</a></li>
             <li><a href="{{ route('konselor.my_schedules.create') }}">Input Jadwal</a></li>
             <li><a href="{{ route('konselor.my_schedules') }}">My Schedules</a></li>
+            <li><a href="{{ route('konselor.feedback') }}"> Feedback</a><li></li>
             <li style="margin-top: 131%;"><a href="{{ route('logout') }}">Log Out</a></li>
         </ul>
     </div>

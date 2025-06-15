@@ -11,21 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('booking', function (Blueprint $table) {
+        Schema::create('jadwal', function (Blueprint $table) {
             $table->id();
-            $table->string('nim'); 
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
-            $table->date('tanggal');
-            $table->string('status'); 
+            $table->unsignedBigInteger('konselor_id'); 
+            $table->foreign('konselor_id')->references('id')->on('konselor')->onDelete('cascade');
+            $table->date('hari'); 
+            $table->time('waktu');
+            $table->string('status');
             $table->timestamps();
         });
-    }
+  
+  }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('booking');
+        Schema::dropIfExists('jadwal');
     }
 };

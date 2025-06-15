@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
 {
     Schema::create('mahasiswa', function (Blueprint $table) { // <-- UBAH KE 'mahasiswas'
-        $table->integer('nim')->primary();
+        $table->bigInteger('nim')->primary();
         $table->unsignedBigInteger('jadwal_id')->nullable();
         $table->foreign('jadwal_id')->references('id')->on('jadwal')->onDelete('set null'); // <-- UBAH KE 'jadwals'
         $table->date('tanggal'); // Pastikan ini tanggal lahir atau apa, jika bukan, sesuaikan nama

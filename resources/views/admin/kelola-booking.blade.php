@@ -81,12 +81,13 @@
             <li><a href="{{ route('manage.counselor') }}">Manage Counselor</a></li>
             <li><a href="{{ route('manage.schedule') }}">Manage Schedule</a></li>
             <li><a href="{{ route('manage.student') }}">Manage Student</a></li>
+            <li><a href="{{ route('manage.feedback') }}" class="active"> Manage Feedback</a></li>
             <li style="margin-top: 114%;"><a href="{{ route('logout') }}">Log Out</a></li>
         </ul>
     </div>
 
     <div class="header">
-        <h2>Hello Rindu,</h2>
+        <h2>Hello {{ Auth::user()->name }},</h2>
         <h1>Good Morning!</h1>
     </div>
 
@@ -117,8 +118,8 @@
     <div class="profil">
         <img src="{{ asset('images/profil.jpg') }}" alt="Foto Profil">
         <div class="profile-info">
-            <h3>Rindu Naella Darmawan</h3>
-            <p>Rindu@mindmeet.com</p>
+            <h3>{{ Auth::user()->name }}</h3>
+            <p>{{ Auth::user()->email }}</p>
         </div>
     </div>
 

@@ -1,171 +1,83 @@
-{{-- resources/views/appointments/home.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Home - Today's Appointment</title>
+    <title>Manage Schedules</title>
+    <link rel="stylesheet" href="{{ asset('css/konselor.css') }}" />
     <style>
-        /* CSS sama seperti sebelumnya */
-        body {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(5, 1fr);
-            grid-column-gap: 8px;
-            grid-row-gap: 8px;
-            height: 97.5vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9f9f9;
-        }
+        .table-container { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle;}
+        th { background-color: #f4f4f4; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
 
-        .navigation-bar {
-            grid-area: 1 / 1 / 6 / 2;
-            width: 300px;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .navigation-bar .row {
-            display: flex; 
-            align-items: center;
-        }
-
-        .navigation-bar img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 20px;
-            margin-top: 20px;
-        }
-
-        .navigation-bar h2 {
-            margin-bottom: 20px;
-            color: #555;
-            margin-top: 30px;
-        }
-
-        .navigation-bar ul {
-            list-style-type: none;
-            width: 100%;
-        }
-
-        .navigation-bar li {
-            margin-bottom: 10px;
-        }
-
-        .navigation-bar a {
-            text-decoration: none;
-            display: block;
-            width: 80%;
-            padding: 10px 10px;
-            color: #333;
+        /* Styling untuk status badge */
+        .schedule-status {
+            padding: 4px 8px;
             border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .navigation-bar a:hover {
-            background-color: #555;
-            color: white;
-        }
-
-        .header {
-            grid-area: 1 / 2 / 2 / 6;
-            background-color: white;
-            padding: 20px;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .calendar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .calendar-header h2 {
-            margin-right: 550px;
-            font-size: 24px;
-        }
-
-        .calendar-nav button {
-            padding: 10px 20px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .calendar-nav button:hover {
-            background-color: #bbb;
-        }
-
-        .calendar-nav {
-            justify-content: space-between;
-            display: flex;
-            gap: 10px;
-        }
-
-        .main {
-            grid-area: 2 / 2 / 6 / 6;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: grid;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-        }
-
-        .day-header, .day-cell {
-            border: 1px solid black;
-            padding: 5px;
-            text-align: center;
-        }
-
-        .day-header {
+            font-size: 0.85em;
             font-weight: bold;
-            background-color: #f5f5f5;
-        }
-
-        .day-cell {
-            min-height: 50px;
-            position: relative;
-        }
-
-        .day-cell .event {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            background-color: #ffeb3b;
-            padding: 5px;
-            border-radius: 3px;
-            font-size: 12px;
-            text-align: left;
-        }
-
-        .event.green {
-            background-color: #4caf50;
             color: white;
+            display: inline-block;
+            text-transform: capitalize; /* Kapitalisasi huruf pertama */
+        }
+        .schedule-status.available { background-color: #28a745; } /* Hijau */
+        .schedule-status.not_available { background-color: #ffc107; color: #333; } /* Kuning */
+        .schedule-status.booked { background-color: #007bff; } /* Biru */
+        .schedule-status.cancelled { background-color: #dc3545; } /* Merah */
+        .schedule-status.completed { background-color: #6c757d; } /* Abu-abu gelap */
+
+
+        /* Gaya umum untuk tombol Aksi (Edit, Delete) */
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .schedule-actions .button {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid transparent;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            
+            font-size: 16px;
+            font-family: inherit;
+            line-height: 1.2;
+            height: auto;
+            box-sizing: border-box;
+            white-space: nowrap;
+            min-width: 70px;
+            text-align: center;
+            
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0;
+            outline: none;
+
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
         }
 
-        .event.orange {
-            background-color: #ff9800;
-            color: white;
+        .schedule-actions .button.delete {
+            background-color: #dc3545;
+        }
+
+        .schedule-actions .button:hover {
+            filter: brightness(110%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .schedule-actions .button:active {
+            transform: translateY(0);
+            box-shadow: none;
         }
     </style>
 </head>
@@ -177,60 +89,86 @@
             <h2>MindMeet</h2>
         </div>
         <ul>
-            <li><a href="{{ route('booking.index') }}">Manage Booking</a></li>
-            <li><a href="{{ route('counselor.index') }}">Manage Counselor</a></li>
-            <li><a href="{{ route('schedule.index') }}">Manage Schedule</a></li>
-            <li><a href="{{ route('student.index') }}">Manage Student</a></li>
+            <li><a href="{{ route('manage.booking') }}">Manage Booking</a></li>
+            <li><a href="{{ route('manage.counselor') }}">Manage Counselor</a></li>
+            <li><a href="{{ route('manage.schedule') }}">Manage Schedule</a></li>
+            <li><a href="{{ route('manage.student') }}">Manage Student</a></li>
+            <li><a href="{{ route('manage.feedback') }}" class="active"> Manage Feedback</a></li>
             <li style="margin-top: 114%;"><a href="{{ route('logout') }}">Log Out</a></li>
         </ul>
     </div>
 
     <div class="header">
-        <div class="calendar-header">
-            <h2>September 2025</h2>
-            <div class="calendar-nav">
-                <button>Month</button>
-                <button>Week</button>
-                <button>Day</button>
-                <button>List</button>
-            </div>
-        </div>
+        <h2>Hello {{ Auth::user()->name }},</h2>
+        <h1>Manage All Schedules</h1>
     </div>
 
     <div class="main">
-        <div class="calendar-grid">
-            {{-- Day Headers --}}
-            @foreach(['MON','TUE','WED','THU','FRI','SAT','SUN'] as $day)
-                <div class="day-header">{{ $day }}</div>
-            @endforeach
+        <div class="table-container">
+            <h2>All Schedules List</h2>
 
-            {{-- Sample static days and events --}}
-            @php
-                $events = [
-                    8 => ['9:00 (2 hours)', '13:00 (60 min)'],
-                    17 => ['20:00 (60 min)'],
-                    18 => ['13:00 (60 min)'],
-                    21 => ['13:00 (60 min)'],
-                    24 => ['13:00 (60 min)'],
-                ];
-            @endphp
-
-            @for ($i = 29; $i <= 31; $i++)
-                <div class="day-cell">{{ $i }}</div>
-            @endfor
-
-            @for ($i = 1; $i <= 30; $i++)
-                <div class="day-cell">
-                    {{ $i }}
-                    @if(isset($events[$i]))
-                        @foreach($events[$i] as $event)
-                            <div class="event green">{{ $event }}</div>
-                        @endforeach
-                    @endif
+            @if (session('success'))
+                <div style="color: green; margin-bottom: 10px; padding: 10px; border: 1px solid green; background-color: #d4edda; border-radius: 5px;">
+                    {{ session('success') }}
                 </div>
-            @endfor
+            @endif
+            @if (session('error'))
+                <div style="color: red; margin-bottom: 10px; padding: 10px; border: 1px solid red; background-color: #f8d7da; border-radius: 5px;">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Jadwal</th>
+                        <th>Nama Konselor</th>
+                        <th>Hari</th>
+                        <th>Waktu</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($schedules as $schedule)
+                        <tr>
+                            <td>{{ $schedule->id }}</td>
+                            <td>{{ $schedule->konselor->nama ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($schedule->hari)->format('d F Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($schedule->waktu)->format('H:i') }}</td>
+                            <td>
+                                {{-- Menampilkan status booking jika ada dan aktif, jika tidak, status jadwal --}}
+                                @if ($schedule->booking && !in_array($schedule->booking->status, ['cancelled', 'completed']))
+                                    <span class="schedule-status booked">Booked</span>
+                                @else
+                                    <span class="schedule-status {{ $schedule->status }}">{{ ucfirst($schedule->status) }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="schedule-actions">
+                                    {{-- PERBAIKAN: Kondisi untuk menampilkan tombol Edit/Delete --}}
+                                    @if ($schedule->status == 'available' && (!$schedule->booking || in_array($schedule->booking->status, ['cancelled', 'completed'])))
+                                        <a href="{{ route('manage.schedule.edit', $schedule->id) }}" class="button">Edit</a>
+
+                                        <form action="{{ route('manage.schedule.destroy', $schedule->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?');" style="display:inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="button delete">Delete</button>
+                                        </form>
+                                    @else
+                                        <span style="color: #6c757d; font-size: 0.9em;">N/A</span>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Tidak ada jadwal yang ditemukan.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-
 </body>
 </html>

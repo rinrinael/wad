@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->integer('nim'); // Ensure this matches the 'nim' type in 'mahasiswa'
+            $table->bigInteger('nim'); // Ensure this matches the 'nim' type in 'mahasiswa'
             $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
             $table->unsignedBigInteger('konselor_id'); // Changed to unsignedBigInteger to match 'id' of 'konselor'
             $table->foreign('konselor_id')->references('id')->on('konselor')->onDelete('cascade');
+            $table->unsignedBigInteger('booking_id');
+            $table->foreign('booking_id')->references('id')->on('booking')->onDelete('cascade');
             $table->text('komentar'); // Changed to text for potentially longer comments
             $table->integer('rating'); // Consider adding constraints like ->unsigned() and ->min(1)->max(5)
             $table->timestamps();

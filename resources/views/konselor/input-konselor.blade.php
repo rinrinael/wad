@@ -18,6 +18,7 @@
             <li><a href="{{ route('konselor.dashboard') }}">Home</a></li> {{-- Ini harus jadi rute dashboard konselor --}}
             <li><a href="{{ route('konselor.my_schedules') }}">My Schedules</a></li> {{-- Ubah ini jadi lihat jadwal sendiri --}}
             <li><a href="{{ route('konselor.my_schedules.store') }}">Input Jadwal</a></li> {{-- Ubah ini jadi input jadwal --}}
+            <li><a href="{{ route('konselor.feedback') }}"> Feedback</a><li></li>
             {{-- Jika ada edit booking, tambahkan rute yang sesuai --}}
             {{-- <li><a href="{{ route('booking.edit') }}">Edit Booking</a></li> --}}
             <li style="margin-top: 131%;"><a href="{{ route('logout') }}">Log Out</a></li>

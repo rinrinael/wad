@@ -13,10 +13,6 @@ return new class extends Migration
     {
         Schema::create('booking', function (Blueprint $table) {
             $table->id();
-            $table->string('nim'); 
-            $table->foreign('nim')->references('nim')->on('mahasiswa')->onDelete('cascade');
-            $table->date('tanggal');
-            $table->string('status'); 
             $table->timestamps();
         });
     }
